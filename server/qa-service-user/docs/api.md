@@ -12,6 +12,68 @@ QA Service User 是医疗问答系统的用户管理服务，基于 Spring Boot 
 
 ## API 端点列表
 
+### DoctorUserController
+
+**文件位置：** [../src/main/java/com/leansofx/qaserviceuser/controller/DoctorUserController.java](../src/main/java/com/leansofx/qaserviceuser/controller/DoctorUserController.java)
+
+医生用户管理控制器，提供医生用户的增删改查和认证功能。
+
+| 方法 | 端点 | 描述 | 参数 | 请求体 | 响应 |
+|--------|----------|-------------|------------|--------------|----------|
+| GET | `/api/doctors` | 获取所有医生用户 | 无 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/{id}` | 根据ID获取医生用户 | id（路径参数） | 无 | DoctorUserResponse |
+| GET | `/api/doctors/username/{username}` | 根据用户名获取医生用户 | username（路径参数） | 无 | DoctorUserResponse |
+| POST | `/api/doctors` | 创建医生用户 | 无 | DoctorUserCreateRequest | DoctorUserResponse |
+| PUT | `/api/doctors/{id}` | 更新医生用户 | id（路径参数） | DoctorUserCreateRequest | DoctorUserResponse |
+| DELETE | `/api/doctors/{id}` | 删除医生用户 | id（路径参数） | 无 | 无内容 |
+| GET | `/api/doctors/active` | 获取所有活跃的医生用户 | 无 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/department/{department}` | 根据科室获取医生用户 | department（路径参数） | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/department/{department}/active` | 根据科室获取活跃的医生用户 | department（路径参数） | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/title/{title}` | 根据职称获取医生用户 | title（路径参数） | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/specialty/{specialty}` | 根据专业领域获取医生用户 | specialty（路径参数） | 无 | List<DoctorUserResponse> |
+| POST | `/api/doctors/authenticate` | 验证医生用户登录 | username, password（查询参数） | 无 | DoctorUserResponse |
+| GET | `/api/doctors/statistics` | 获取医生统计信息 | 无 | 无 | DoctorStatistics |
+
+#### DoctorUserController 数据结构示例
+
+**DoctorUserResponse（医生用户响应）**
+```json
+{
+  "id": "doc001",
+  "username": "dr-zhang-wei",
+  "name": "张伟医生",
+  "title": "主任医师",
+  "department": "心内科",
+  "avatar": "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400",
+  "experience": "15年临床经验",
+  "specialties": ["高血压", "冠心病", "心律失常"],
+  "isActive": true
+}
+```
+
+**DoctorUserCreateRequest（创建医生用户请求）**
+```json
+{
+  "username": "dr-new-doctor",
+  "password": "123456",
+  "name": "新医生",
+  "title": "主治医师",
+  "department": "内科",
+  "avatar": "https://example.com/avatar.jpg",
+  "experience": "5年临床经验",
+  "specialties": ["感冒", "发烧"],
+  "isActive": true
+}
+```
+
+**DoctorStatistics（医生统计信息）**
+```json
+{
+  "totalDoctors": 5,
+  "activeDoctors": 4
+}
+```
+
 ### TestController
 
 **文件位置：** [../src/main/java/com/leansofx/qaserviceuser/controller/TestController.java](../src/main/java/com/leansofx/qaserviceuser/controller/TestController.java)
@@ -139,6 +201,87 @@ QA Service User 是医疗问答系统的用户管理服务，基于 Spring Boot 
 
 ## 使用示例
 
+### 医生用户管理 API
+
+**获取所有医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors
+```
+
+**根据ID获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/doc001
+```
+
+**根据用户名获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/username/dr-zhang-wei
+```
+
+**创建医生用户：**
+```bash
+curl -X POST http://localhost:8080/api/doctors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "dr-new-doctor",
+    "password": "123456",
+    "name": "新医生",
+    "title": "主治医师",
+    "department": "内科",
+    "avatar": "https://example.com/avatar.jpg",
+    "experience": "5年临床经验",
+    "specialties": ["感冒", "发烧"],
+    "isActive": true
+  }'
+```
+
+**更新医生用户：**
+```bash
+curl -X PUT http://localhost:8080/api/doctors/doc001 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "dr-zhang-wei",
+    "password": "123456",
+    "name": "张伟医生",
+    "title": "主任医师",
+    "department": "心内科",
+    "avatar": "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400",
+    "experience": "16年临床经验",
+    "specialties": ["高血压", "冠心病", "心律失常"],
+    "isActive": true
+  }'
+```
+
+**删除医生用户：**
+```bash
+curl -X DELETE http://localhost:8080/api/doctors/doc001
+```
+
+**获取所有活跃的医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/active
+```
+
+**根据科室获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/department/心内科
+```
+
+**根据专业领域获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/specialty/高血压
+```
+
+**验证医生用户登录：**
+```bash
+curl -X POST "http://localhost:8080/api/doctors/authenticate?username=dr-zhang-wei&password=123456"
+```
+
+**获取医生统计信息：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/statistics
+```
+
 ### 测试 CORS 配置
 
 **GET 请求示例：**
@@ -160,11 +303,14 @@ curl -X GET http://localhost:8080/actuator/health
 
 ## 注意事项
 
-1. 当前项目处于开发阶段，仅包含测试端点
+1. 当前项目处于开发阶段，包含医生用户管理功能和测试端点
 2. 所有 API 端点都支持 CORS
 3. Actuator 端点提供了丰富的监控和管理功能
-4. 建议在生产环境中限制 CORS 配置和 Actuator 端点的访问权限
+4. 医生用户密码在数据库中以明文存储，生产环境中应使用加密存储
+5. 建议在生产环境中限制 CORS 配置和 Actuator 端点的访问权限
+6. 医生用户的专业领域（specialties）使用独立的关联表存储
 
 ## 版本历史
 
 - **v0.0.1-SNAPSHOT**：初始版本，包含基础的 CORS 测试功能和 Actuator 监控
+- **v0.0.2-SNAPSHOT**：添加医生用户管理功能，包括增删改查和认证功能

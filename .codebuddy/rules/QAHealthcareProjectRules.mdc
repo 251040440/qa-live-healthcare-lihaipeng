@@ -1,0 +1,137 @@
+---
+description: 
+alwaysApply: true
+enabled: true
+updatedAt: 2025-11-03T02:45:31.640Z
+provider: 
+---
+
+# QA Healthcare Project Rules
+
+## 项目概述
+
+这是一个医疗问答系统项目，采用前后端分离架构：
+- **后端服务**: Spring Boot 微服务架构，位于 `server/` 目录
+- **前端应用**: Vue.js 应用，位于 `web/` 目录
+- **当前分支**: training/base
+
+## 项目结构规范
+
+### 后端服务结构 (server/)
+- `qa-service-user/`: 用户管理服务
+  - 基于 Spring Boot 3.5.7
+  - 端口: 8080
+  - 包含 CORS 配置和 Actuator 监控
+  - API 文档位置: `docs/api.md`
+
+### 前端应用结构 (web/)
+- `qa-web/`: Vue.js 前端应用
+  - 开发端口: 通常为 3000 或 5173
+  - 构建输出: `dist/` 目录
+
+## 开发规范
+
+### API 文档规范
+1. **文档位置**: 每个服务的 `docs/api.md`
+2. **文档格式**: 
+   - 按 Controller 分章节
+   - 使用表格展示 API 端点
+   - 包含完整的数据结构示例
+   - 提供源码文件链接
+3. **表格格式**:
+   ```markdown
+   | 方法 | 端点 | 描述 | 参数 | 请求体 | 响应 |
+   |--------|----------|-------------|------------|--------------|----------|
+   ```
+
+### Git 提交规范
+- 使用中文 commit message
+- 格式: `type: 简要描述`
+- 常用类型: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- 详细说明使用列表格式
+
+### 代码规范
+1. **Java 后端**:
+   - 包名: `com.leansofx.qaserviceuser`
+   - Controller 放在 `controller/` 包下
+   - 配置类放在 `config/` 包下
+   - 启用 CORS 和 Actuator 监控
+
+2. **Vue 前端**:
+   - 组件文件使用 PascalCase
+   - 页面文件放在 `pages/` 或 `views/` 目录
+   - 工具函数放在 `utils/` 目录
+
+## 部署规范
+
+### 本地开发
+1. **后端启动**: 
+   ```bash
+   cd server/qa-service-user
+   ./mvnw spring-boot:run
+   ```
+2. **前端启动**:
+   ```bash
+   cd web/qa-web
+   npm run dev
+   ```
+
+### CloudStudio 部署
+- 遵循 CloudStudioRules 规范
+- 优先部署构建后的静态文件
+- 确保本地预览成功后再部署
+- 部署范围与预览内容保持一致
+
+## 文件管理规范
+
+### 忽略文件
+- Maven: `target/`, `.mvn/wrapper/maven-wrapper.jar`
+- Node.js: `node_modules/`, `dist/`, `*.log`
+- IDE: `.idea/`, `.vscode/`, `*.iml`
+- 系统: `.DS_Store`, `Thumbs.db`
+
+### 文档维护
+- API 变更时同步更新文档
+- 重要配置变更需要在 README.md 中说明
+- 版本发布时更新版本历史
+
+## 质量保证
+
+### 测试要求
+1. 单元测试覆盖率 > 80%
+2. API 测试必须包含正常和异常场景
+3. 前端组件测试覆盖主要交互逻辑
+
+### 代码审查
+1. 所有 PR 需要代码审查
+2. 关注安全性、性能和可维护性
+3. 确保符合项目编码规范
+
+### 监控和日志
+1. 使用 Actuator 进行健康检查
+2. 关键业务操作需要记录日志
+3. 生产环境限制敏感端点访问
+
+## 安全规范
+
+### CORS 配置
+- 开发环境: 允许所有源 (`*`)
+- 生产环境: 限制为具体域名
+- 不允许携带凭证 (`allow-credentials: false`)
+
+### 敏感信息
+- 数据库密码等敏感信息使用环境变量
+- 不在代码中硬编码 API 密钥
+- 生产配置文件不提交到版本控制
+
+## 故障处理
+
+### 常见问题
+1. **CORS 错误**: 检查 CorsConfig 配置
+2. **端口冲突**: 修改 application.properties 中的端口
+3. **依赖问题**: 清理并重新安装依赖
+
+### 日志查看
+- 后端日志: 控制台输出或日志文件
+- 前端错误: 浏览器开发者工具
+- 系统监控: `/actuator/health` 端点

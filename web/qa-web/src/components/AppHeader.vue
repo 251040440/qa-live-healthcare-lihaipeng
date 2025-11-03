@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="logo" @click="navigateTo('/')">
         <img src="https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=100" alt="QA Live Healthcare" />
-        <span>QA Live Healthcare</span>
+        <span>{{ t('header.title') }}</span>
       </div>
       
       <!-- 桌面端菜单 -->
@@ -11,24 +11,32 @@
         <a-menu v-model:selectedKeys="selectedKeys" mode="horizontal" class="nav-menu">
           <a-menu-item key="home" @click="navigateTo('/')">
             <HomeOutlined />
-            首页
+            {{ t('header.nav.home') }}
           </a-menu-item>
           <a-menu-item key="consultation" @click="navigateTo('/consultation')">
             <MessageOutlined />
-            问诊
+            {{ t('header.nav.consultation') }}
           </a-menu-item>
           <a-menu-item key="doctors" @click="navigateTo('/doctors')">
             <TeamOutlined />
-            医生
+            {{ t('header.nav.doctors') }}
           </a-menu-item>
           <a-menu-item key="about" @click="navigateTo('/about')">
             <InfoCircleOutlined />
-            关于
+            {{ t('header.nav.about') }}
           </a-menu-item>
         </a-menu>
+        <a-select
+          v-model:value="locale"
+          style="width: 100px; margin-right: 16px;"
+          @change="handleLanguageChange"
+        >
+          <a-select-option value="zh-cn">{{ t('language.chinese') }}</a-select-option>
+          <a-select-option value="en-us">{{ t('language.english') }}</a-select-option>
+        </a-select>
         <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
           <UserOutlined />
-          医生登录
+          {{ t('header.login') }}
         </a-button>
       </div>
       
@@ -42,7 +50,7 @@
     
     <!-- 移动端抽屉菜单 -->
     <a-drawer
-      title="菜单"
+      :title="t('header.menu')"
       placement="right"
       :open="drawerVisible"
       @close="closeDrawer"
@@ -53,24 +61,32 @@
         <a-menu mode="vertical" class="drawer-menu" :selectedKeys="selectedKeys">
           <a-menu-item key="home" @click="handleMenuClick('/')">
             <HomeOutlined />
-            首页
+            {{ t('header.nav.home') }}
           </a-menu-item>
           <a-menu-item key="consultation" @click="handleMenuClick('/consultation')">
             <MessageOutlined />
-            问诊
+            {{ t('header.nav.consultation') }}
           </a-menu-item>
           <a-menu-item key="doctors" @click="handleMenuClick('/doctors')">
             <TeamOutlined />
-            医生
+            {{ t('header.nav.doctors') }}
           </a-menu-item>
           <a-menu-item key="about" @click="handleMenuClick('/about')">
             <InfoCircleOutlined />
-            关于
+            {{ t('header.nav.about') }}
           </a-menu-item>
         </a-menu>
+        <a-select
+          v-model:value="locale"
+          style="width: 100%; margin-bottom: 16px;"
+          @change="handleLanguageChange"
+        >
+          <a-select-option value="zh-cn">{{ t('language.chinese') }}</a-select-option>
+          <a-select-option value="en-us">{{ t('language.english') }}</a-select-option>
+        </a-select>
         <a-button type="primary" class="drawer-login-btn" @click="handleMenuClick('/doctor/login')" block>
           <UserOutlined />
-          医生登录
+          {{ t('header.login') }}
         </a-button>
       </div>
     </a-drawer>
@@ -80,12 +96,19 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { HomeOutlined, MessageOutlined, TeamOutlined, InfoCircleOutlined, UserOutlined, MenuOutlined } from '@ant-design/icons-vue';
 
 const router = useRouter();
 const route = useRoute();
+const { t, locale } = useI18n();
 const selectedKeys = ref<string[]>(['home']);
 const drawerVisible = ref<boolean>(false);
+
+// 语言切换处理
+const handleLanguageChange = (value: string) => {
+  locale.value = value;
+};
 
 watch(() => route.path, (newPath) => {
   if (newPath === '/') {

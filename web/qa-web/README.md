@@ -40,7 +40,10 @@ qa-web/
 │   └── config.json              # Bolt 配置文件
 ├── .env                         # 环境变量配置
 ├── .gitignore                   # Git 忽略文件配置
+├── app-management.sh            # 应用管理脚本
 ├── index.html                   # HTML 入口文件
+├── logs/                        # 应用日志目录
+│   └── application.log          # 应用运行日志
 ├── package.json                 # 项目依赖和脚本配置
 ├── package-lock.json            # 依赖锁定文件
 ├── README.md                    # 项目说明文档
@@ -70,6 +73,9 @@ qa-web/
 ### 开发工具
 - **@vitejs/plugin-vue** (v5.1.4) - Vite 的 Vue 插件
 - **vue-tsc** (v2.1.6) - Vue 的 TypeScript 编译器
+
+### 应用管理
+- **app-management.sh** - 自定义应用管理脚本，提供启动、停止、重启、状态查看和日志查看功能
 
 ## 核心功能模块
 
@@ -108,6 +114,43 @@ npm install
 npm run dev
 ```
 启动开发服务器，默认运行在 `http://localhost:5173`
+
+### 应用管理脚本
+项目提供了便捷的应用管理脚本 `app-management.sh`，支持以下操作：
+
+```bash
+# 启动应用
+npm run start
+# 或
+./app-management.sh start
+
+# 停止应用
+npm run stop
+# 或
+./app-management.sh stop
+
+# 重启应用
+npm run restart
+# 或
+./app-management.sh restart
+
+# 查看应用状态
+npm run status
+# 或
+./app-management.sh status
+
+# 查看应用日志
+npm run logs
+# 或
+./app-management.sh logs
+```
+
+#### 应用管理脚本功能说明
+- **自动端口管理**: 启动前自动检查并清理占用的端口
+- **进程管理**: 通过 PID 文件管理应用进程，支持优雅停止和强制终止
+- **日志管理**: 应用日志统一输出到 `logs/application.log` 文件
+- **依赖检查**: 启动前自动检查并安装缺失的依赖
+- **状态监控**: 显示详细的进程信息和端口监听状态
 
 ### 构建生产版本
 ```bash

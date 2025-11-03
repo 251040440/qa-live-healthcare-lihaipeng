@@ -41,6 +41,13 @@ qa-service-user/
                 └── QaServiceUserApplicationTests.java  # Spring Boot 应用测试类
 ```
 
+## 项目文档
+
+本项目提供了详细的技术文档，请参考以下链接：
+
+- [API 接口文档](docs/api.md) - 详细的 API 接口说明和使用示例
+- [项目结构文档](docs/project-structure.md) - 项目架构和代码结构说明
+
 ## 项目技术栈信息
 
 ### 核心框架

@@ -48,13 +48,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { store, Doctor } from '../store';
+import { getAllDoctors } from '../api';
+import type { DoctorUserResponse } from '../api';
 
 const router = useRouter();
 
+// 使用本地状态作为默认数据
 const allDoctors = computed(() => store.state.doctors);
+// 创建一个响应式引用来存储从API获取的医生数据
+const doctorsFromApi = ref<DoctorUserResponse[]>([]);
+
+// 从API获取医生数据
+const fetchDoctors = async () => {
+  try {
+    const doctors = await getAllDoctors();
+    doctorsFromApi.value = doctors;
+    console.log('从API获取的医生数据:', doctors);
+  } catch (error) {
+    console.error('获取医生数据失败:', error);
+  }
+};
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchDoctors();
+});
 
 const goToConsultation = (doctor: Doctor) => {
   router.push(`/consultation/${doctor.username}`);

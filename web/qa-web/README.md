@@ -121,6 +121,60 @@ npm run preview
 ```
 本地预览生产构建版本
 
+### 应用管理脚本
+
+项目提供了 `app-management.sh` 脚本，用于在后台管理应用进程。该脚本使用 nohup 方式启动应用，支持进程管理和日志记录。
+
+#### 使用方式
+
+1. **直接使用脚本**：
+```bash
+./app-management.sh {start|stop|restart|status|logs|help}
+```
+
+2. **通过 npm 脚本**：
+```bash
+npm run app:start    # 启动应用
+npm run app:stop     # 停止应用
+npm run app:restart  # 重启应用
+npm run app:status   # 查看应用状态
+npm run app:logs     # 查看应用日志
+```
+
+#### 功能说明
+
+- **start**: 在后台启动应用，进程 ID 写入 `.pid` 文件，日志输出到 `logs/application.log`
+- **stop**: 停止正在运行的应用，清理 `.pid` 文件
+- **restart**: 重启应用（先停止再启动）
+- **status**: 显示应用运行状态、进程 ID、访问地址和启动时间
+- **logs**: 实时查看应用日志（使用 tail -f 命令）
+- **help**: 显示帮助信息
+
+#### 文件说明
+
+- `.pid`: 存储应用进程 ID
+- `logs/application.log`: 应用运行日志文件
+- `app-management.sh`: 应用管理脚本
+
+#### 示例
+
+```bash
+# 启动应用
+npm run app:start
+
+# 查看状态
+npm run app:status
+
+# 查看日志
+npm run app:logs
+
+# 重启应用
+npm run app:restart
+
+# 停止应用
+npm run app:stop
+```
+
 ## 路由结构
 
 | 路径 | 组件 | 描述 |

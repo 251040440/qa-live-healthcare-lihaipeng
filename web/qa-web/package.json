@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "app:start": "./app-management.sh start",
+    "app:stop": "./app-management.sh stop",
+    "app:restart": "./app-management.sh restart",
+    "app:status": "./app-management.sh status",
+    "app:logs": "./app-management.sh logs"
   },
   "dependencies": {
     "ant-design-vue": "^4.2.6",

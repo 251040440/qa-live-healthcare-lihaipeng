@@ -1,5 +1,32 @@
 # QA Service User
 
+## 快速启动指南
+
+### ⚠️ 重要提示：优先使用应用管理脚本
+为了获得最佳的开发体验和生产环境稳定性，**请务必使用提供的应用管理脚本**而不是直接使用Maven命令启动服务。
+
+### 一键启动所有服务
+```bash
+# 1. 启动基础设施（MySQL + phpMyAdmin）
+cd /home/azureuser/source/tkt01/qa-live-healthcare-bolt-vue-c1joxy7j
+docker compose up -d
+
+# 2. 等待30秒让MySQL初始化，然后启动应用服务
+cd server/qa-service-user
+./start.sh
+
+# 3. 验证服务状态
+curl http://localhost:8080/actuator/health
+```
+
+### 服务状态检查
+```bash
+# 检查所有服务
+echo "MySQL: $(docker ps | grep mysql | wc -l) running"
+echo "phpMyAdmin: $(docker ps | grep phpmyadmin | wc -l) running" 
+echo "qa-service-user: $(ps aux | grep qa-service-user | grep -v grep | wc -l) running"
+```
+
 ## 项目概述
 
 QA Service User 是医疗问答系统中的用户管理服务，基于 Spring Boot 3.5.7 构建。该服务提供用户相关的 API 接口，支持跨域访问，并集成了 Spring Boot Actuator 进行应用监控和健康检查。
@@ -65,6 +92,16 @@ qa-service-user/
 - **spring-boot-maven-plugin**: Spring Boot Maven 插件
 
 ## 应用管理脚本
+
+### 🎯 使用建议：管理脚本是首选方式
+项目提供的应用管理脚本是**启动、停止和管理服务的最佳实践**，无论在开发环境还是生产环境都应该优先使用。
+
+### 脚本优势
+- **🔄 完整的生命周期管理**：启动、停止、重启、状态检查
+- **📊 进程监控**：PID管理、后台运行、状态追踪
+- **📝 日志管理**：自动创建日志目录、统一日志输出
+- **🛡️ 错误处理**：端口检查、构建验证、自动清理
+- **⚡ 便利性**：一键操作、快速重启、详细状态信息
 
 项目提供了完整的应用生命周期管理脚本，位于项目根目录下：
 
@@ -136,11 +173,147 @@ qa-service-user/
 - 脚本会自动处理 PID 文件和日志目录
 - 所有脚本都包含错误处理和状态检查
 
+## 故障排除
+
+### 常见问题
+
+#### MySQL 连接失败
+```bash
+# 检查 MySQL 容器状态
+docker ps | grep healthcare_mysql
+
+# 查看 MySQL 日志
+docker logs healthcare_mysql
+
+# 重新启动 MySQL
+docker compose restart healthcare_mysql
+```
+
+#### 应用启动失败
+```bash
+# 检查端口占用
+netstat -tlnp | grep 8080
+
+# 查看应用日志
+tail -f logs/application.log
+
+# 重新构建并启动
+./mvnw clean package && ./restart.sh
+```
+
+#### 数据库连接问题
+```bash
+# 验证数据库连接
+docker exec healthcare_mysql mysql -uroot -proot -e "SHOW DATABASES;"
+
+# 检查数据表
+docker exec healthcare_mysql mysql -uroot -proot healthcare -e "SHOW TABLES;"
+
+# 重新导入数据
+docker exec healthcare_mysql mysql -uroot -proot healthcare -e "source /tmp/doctor_user_data.sql;"
+```
+
+### 服务依赖关系
+```
+qa-service-user (8080) 
+    ↓ 依赖
+healthcare_mysql (3306)
+    ↓ 依赖  
+docker network
+```
+
+**注意**: 必须按顺序启动服务，确保下游服务完全启动后再启动上游服务。
+
+## 项目启动顺序
+
+### 正确的启动流程
+
+为了确保所有服务正常运行，请按照以下顺序启动项目：
+
+#### 1. 启动基础设施服务
+```bash
+# 在项目根目录下启动 MySQL 和 phpMyAdmin 服务
+cd /home/azureuser/source/tkt01/qa-live-healthcare-bolt-vue-c1joxy7j
+docker compose up -d healthcare_mysql
+docker compose up -d healthcare_phpmyadmin
+
+# 验证 MySQL 服务状态
+docker ps | grep healthcare_mysql
+```
+
+#### 2. 初始化数据库
+```bash
+# 等待 MySQL 完全启动（约30秒），然后导入数据
+docker exec healthcare_mysql mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS healthcare;"
+
+# 复制并执行数据初始化脚本
+docker cp /home/azureuser/source/tkt01/qa-live-healthcare-bolt-vue-c1joxy7j/server/qa-service-user/src/main/resources/db/data/doctor_user_data.sql healthcare_mysql:/tmp/
+docker exec healthcare_mysql mysql -uroot -proot healthcare -e "source /tmp/doctor_user_data.sql;"
+
+# 验证数据导入
+docker exec healthcare_mysql mysql -uroot -proot healthcare -e "SELECT COUNT(*) as doctor_count FROM doctor_user;"
+```
+
+#### 3. 启动 qa-service-user 服务
+```bash
+# 进入服务目录
+cd /home/azureuser/source/tkt01/qa-live-healthcare-bolt-vue-c1joxy7j/server/qa-service-user
+
+# 构建项目（首次启动或代码变更后需要）
+./mvnw clean package
+
+# 启动服务
+./start.sh
+
+# 验证服务状态
+./status.sh
+```
+
+#### 4. 验证所有服务
+```bash
+# 检查 MySQL 状态
+curl -s http://localhost:6080 > /dev/null && echo "phpMyAdmin: ✅" || echo "phpMyAdmin: ❌"
+
+# 检查 qa-service-user 健康状态
+curl -s http://localhost:8080/actuator/health | grep -q '"status":"UP"' && echo "qa-service-user: ✅" || echo "qa-service-user: ❌"
+
+# 检查 CORS 配置
+curl -s http://localhost:8080/api/test/cors | grep -q "CORS configuration is working" && echo "CORS: ✅" || echo "CORS: ❌"
+```
+
+### 服务访问信息
+
+| 服务 | URL | 用户名/密码 | 说明 |
+|------|-----|------------|------|
+| MySQL | localhost:3306 | root/root | 数据库服务 |
+| phpMyAdmin | http://localhost:6080 | root/root | Web数据库管理界面 |
+| qa-service-user | http://localhost:8080 | - | 用户管理API服务 |
+
 ## 开发调试
 
-### 启动应用
+### 🚨 开发环境启动建议
+即使在开发环境中，我们仍然**强烈推荐使用管理脚本**而非直接使用Maven命令，原因如下：
+- ✅ **后台运行**：关闭终端后服务继续运行
+- ✅ **日志管理**：所有输出统一保存到日志文件
+- ✅ **进程监控**：方便查看服务状态和重启
+- ✅ **错误处理**：自动处理常见启动问题
+
+### 推荐的开发启动方式
 ```bash
-# 使用 Maven Wrapper 启动
+# 使用应用管理脚本启动（推荐）
+./start.sh
+
+# 查看服务状态
+./status.sh
+
+# 实时查看日志
+tail -f logs/application.log
+```
+
+### 传统Maven启动方式（不推荐）
+```bash
+# ⚠️ 仅用于快速测试，不建议常规使用
+# 使用 Maven Wrapper 启动（确保数据库已运行）
 ./mvnw spring-boot:run
 
 # 或者使用 Maven 启动

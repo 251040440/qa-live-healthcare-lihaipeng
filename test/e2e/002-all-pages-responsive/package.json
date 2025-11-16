@@ -1,0 +1,21 @@
+{
+  "name": "002-all-pages-responsive-tests",
+  "version": "1.0.0",
+  "description": "所有页面响应式测试 - 测试验证所有页面在桌面和手机端的加载情况",
+  "main": "scripts/test_all_pages_responsive.js",
+  "scripts": {
+    "test": "node scripts/test_all_pages_responsive.js",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "playwright": "^1.56.1"
+  },
+  "keywords": [
+    "e2e",
+    "responsive",
+    "testing",
+    "playwright"
+  ],
+  "author": "QA Healthcare Team",
+  "license": "MIT"
+}

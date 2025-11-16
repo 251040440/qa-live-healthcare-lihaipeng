@@ -1,0 +1,23 @@
+{
+  "name": "001-doctor-list-page-tests",
+  "version": "1.0.0",
+  "description": "医生列表页面端到端测试 - 验证医生列表页面数据加载和显示",
+  "main": "scripts/test_doctors_simple.js",
+  "scripts": {
+    "test": "node scripts/test_doctors_simple.js",
+    "test-detailed": "node scripts/test_doctors_page.js",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "playwright": "^1.56.1"
+  },
+  "keywords": [
+    "e2e",
+    "doctor-list",
+    "testing",
+    "playwright",
+    "healthcare"
+  ],
+  "author": "QA Healthcare Team",
+  "license": "MIT"
+}

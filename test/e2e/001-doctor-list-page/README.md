@@ -42,48 +42,52 @@ npm run dev
 
 ## 测试脚本
 
-### 🆕 新版测试脚本（推荐）
-`scripts/test_doctors_simple_v2.py` - 简化版测试脚本，支持新的报告目录结构
+### 🆕 新版JavaScript测试脚本（推荐）
+`scripts/test_doctors_simple.js` - 简化版测试脚本，支持新的报告目录结构
 - ✅ 自动生成带时间戳的报告目录
 - ✅ 每个报告有独立的 assets 子目录
 - ✅ 自动保存截图到对应目录
+- ✅ 使用Node.js和Playwright，与002测试保持一致
 
-`scripts/test_doctors_page_v2.py` - 完整版测试脚本，支持新目录结构
-- ✅ 包含详细验证步骤和错误处理
-- ✅ 生成完整的端到端测试报告
-- ✅ 支持独立资源管理
+`scripts/verify_test_setup.js` - 测试环境验证脚本
+- ✅ 验证Playwright和浏览器安装
+- ✅ 检查前后端服务运行状态
+- ✅ 验证医生数据加载
 
-### 旧版测试脚本（兼容）
-`scripts/test_doctors_simple.py` - 旧版简化脚本（兼容模式）
-`scripts/test_doctors_page.py` - 旧版完整脚本（兼容模式）
+
 
 ## 如何运行测试
 
-### 🆕 方式1：运行新版简化测试（推荐）
+### 🆕 方式1：运行新版JavaScript简化测试（推荐）
 ```bash
 cd test/e2e/001-doctor-list-page
-python scripts/test_doctors_simple_v2.py
+npm install                    # 首次运行需要安装依赖
+npm test                       # 运行简化测试
+# 或者
+node scripts/test_doctors_simple.js
 ```
 自动生成：
 - 带时间戳的报告目录
 - 独立的 assets 子目录
 - 完整的测试报告和截图
 
-### 🆕 方式2：运行新版完整测试
+### 🆕 方式2：验证测试环境
 ```bash
 cd test/e2e/001-doctor-list-page
-python scripts/test_doctors_page_v2.py
+node scripts/verify_test_setup.js           # 快速验证
+node scripts/verify_test_setup.js --report  # 生成详细验证报告
 ```
-包含：
-- 详细的验证步骤
-- 完整的错误处理
-- 丰富的测试报告内容
+验证：
+- Playwright和浏览器安装
+- 前后端服务运行状态
+- 医生数据加载
 
-### 方式3：运行旧版测试（兼容）
-```bash
-cd test/e2e/001-doctor-list-page
-python scripts/test_doctors_simple.py
-```
+使用 `--report` 参数可以生成带时间戳的验证报告目录，包含：
+- 详细的验证结果报告
+- 验证截图保存到独立assets目录
+- 服务状态检查和建议操作
+
+
 
 ## 测试输出
 
@@ -133,21 +137,21 @@ reports/test_report_YYYYMMDD-HHMMSS/
 ### 📊 测试报告列表
 
 | 执行时间 (GMT+8) | 直接结果 | 医生验证 | 科室验证 | 报告链接 |
-|------------------|----------|----------|----------|----------|
-| 2025-11-16 20:56:53 | ✅ 通过 | 5/5 (100%) | 5/5 (100%) | [📄 查看报告](reports/test_report_20251116-205653/report.md) |
+| 2025-11-16 22:06:41 | ✅ 通过 | 5/5 (100%) | 5/5 (100%) | [📄 查看报告](reports/test_report_20251116_220641/report.md) |
+| 2025-11-16 20:56:53 | ✅ 通过 | 5/5 (100%) | 5/5 (100%) | [📄 查看报告](reports/test_report_20251116_205653/report.md) |
 
 ### 📈 测试统计总结
-- **总执行次数**: 1次
-- **通过率**: 100% (1/1)
+- **总执行次数**: 2次
+- **通过率**: 100% (2/2)
 - **平均医生验证率**: 100% (5/5)
 - **平均科室验证率**: 100% (5/5)
-- **最近执行**: 2025-11-16 20:56:53 (GMT+8)
-- **最新脚本**: test_doctors_simple_v2.py (支持GMT+8时区和新目录结构)
+- **最近执行**: 2025-11-16 22:06:41 (GMT+8)
+- **最新脚本**: test_doctors_simple.js (JavaScript版本)
 
 ### 🔍 快速查看
-- **📋 最新报告**: [test_report_20251116-205653/report.md](reports/test_report_20251116-205653/report.md)
-- **🖼️ 最新截图**: 查看 `reports/test_report_20251116-205653/assets/` 目录下的最新截图
-- **⚡ 立即运行**: 执行 `python scripts/test_doctors_simple_v2.py`
+- **📋 最新报告**: [test_report_20251116_220641/report.md](reports/test_report_20251116_220641/report.md)
+- **🖼️ 最新截图**: 查看 `reports/test_report_20251116_220641/assets/` 目录下的最新截图
+- **⚡ 立即运行**: 执行 `npm test` 或 `node scripts/test_doctors_simple.js`
 
 ### 📋 报告内容说明
 所有测试报告均包含：
@@ -169,16 +173,22 @@ reports/test_report_YYYYMMDD-HHMMSS/
 ```
 001-doctor-list-page/
 ├── README.md                           # 📖 本说明文档
+├── package.json                        # 📦 Node.js项目配置
 ├── scripts/                            # 🛠️ 测试脚本目录
-│   ├── test_doctors_simple_v2.py      # ✅ 新版简化脚本（推荐）
-│   └── test_doctors_page_v2.py        # ✅ 新版完整脚本
+│   ├── test_doctors_simple.js         # ✅ 新版JavaScript简化脚本（推荐）
+│   └── verify_test_setup.js           # ✅ 测试环境验证脚本
 ├── reports/                            # 📊 测试报告目录
-│   └── test_report_20251116-205653/   # 🆕 最新测试报告
+│   └── verification_report_20251116_221529/  # 🆕 验证报告（使用--report参数生成）
+│       ├── verification_report.md       #    验证报告主体
+│       └── assets/                      #    验证截图资源
+│           └── verification_screenshot.png
+│   └── test_report_20251116_220641/   # 🆕 最新测试报告
 │       ├── report.md                  #    报告主体
 │       └── assets/                    #    专用资源
 │           ├── homepage_simple.png
 │           ├── doctors_page_simple.png
 │           └── doctors_page_detail.png
+│   └── test_report_20251116-205653/   # 📋 历史测试报告
 │   ├── test_report_20251116-203847/   # 📋 历史测试报告
 │   ├── test_report_20251116-123441/   # 📋 历史测试报告
 │   ├── test_report_20251116-123002/   # 📋 历史测试报告

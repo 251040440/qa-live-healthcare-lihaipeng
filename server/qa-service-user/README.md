@@ -17,6 +17,9 @@ cd server/qa-service-user
 
 # 3. 验证服务状态
 curl http://localhost:8080/actuator/health
+
+# 4. 验证数据库连接和测试数据
+curl http://localhost:8080/api/doctors
 ```
 
 ### 服务状态检查
@@ -279,6 +282,9 @@ curl -s http://localhost:8080/actuator/health | grep -q '"status":"UP"' && echo 
 
 # 检查 CORS 配置
 curl -s http://localhost:8080/api/test/cors | grep -q "CORS configuration is working" && echo "CORS: ✅" || echo "CORS: ❌"
+
+# 验证数据库连接和测试数据
+curl -s http://localhost:8080/api/doctors | grep -q "doc001" && echo "数据库连接和测试数据: ✅" || echo "数据库连接和测试数据: ❌"
 ```
 
 ### 服务访问信息
@@ -392,6 +398,9 @@ curl http://localhost:8080/actuator/info
 
 # 测试 CORS 配置
 curl http://localhost:8080/api/test/cors
+
+# 验证数据库连接和测试数据（重要）
+curl http://localhost:8080/api/doctors
 ```
 
 ## 构建和部署

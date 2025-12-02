@@ -11,25 +11,31 @@
         <a-menu v-model:selectedKeys="selectedKeys" mode="horizontal" class="nav-menu">
           <a-menu-item key="home" @click="navigateTo('/')">
             <HomeOutlined />
-            首页
+            {{ $t('nav.home') }}
           </a-menu-item>
           <a-menu-item key="consultation" @click="navigateTo('/consultation')">
             <MessageOutlined />
-            问诊
+            {{ $t('nav.consultation') }}
           </a-menu-item>
           <a-menu-item key="doctors" @click="navigateTo('/doctors')">
             <TeamOutlined />
-            医生
+            {{ $t('nav.doctors') }}
           </a-menu-item>
           <a-menu-item key="about" @click="navigateTo('/about')">
             <InfoCircleOutlined />
-            关于
+            {{ $t('nav.about') }}
           </a-menu-item>
         </a-menu>
-        <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
-          <UserOutlined />
-          医生登录
-        </a-button>
+        <div class="header-actions">
+          <a-select v-model:value="currentLanguage" @change="handleLanguageChange" class="language-select">
+            <a-select-option value="zh-CN">中文</a-select-option>
+            <a-select-option value="en-US">English</a-select-option>
+          </a-select>
+          <a-button type="primary" class="login-btn" @click="navigateTo('/doctor/login')">
+            <UserOutlined />
+            {{ $t('nav.login') }}
+          </a-button>
+        </div>
       </div>
 
       <!-- 移动端汉堡包菜单按钮 -->
@@ -59,24 +65,30 @@
         <div class="mobile-menu-content">
           <div class="menu-item" @click="navigateAndClose('/')">
             <HomeOutlined />
-            <span>首页</span>
+            <span>{{ $t('nav.home') }}</span>
           </div>
           <div class="menu-item" @click="navigateAndClose('/consultation')">
             <MessageOutlined />
-            <span>问诊</span>
+            <span>{{ $t('nav.consultation') }}</span>
           </div>
           <div class="menu-item" @click="navigateAndClose('/doctors')">
             <TeamOutlined />
-            <span>医生</span>
+            <span>{{ $t('nav.doctors') }}</span>
           </div>
           <div class="menu-item" @click="navigateAndClose('/about')">
             <InfoCircleOutlined />
-            <span>关于</span>
+            <span>{{ $t('nav.about') }}</span>
+          </div>
+          <div class="menu-item language-item">
+            <a-select v-model:value="currentLanguage" @change="handleLanguageChange" class="mobile-language-select">
+              <a-select-option value="zh-CN">中文</a-select-option>
+              <a-select-option value="en-US">English</a-select-option>
+            </a-select>
           </div>
           <div class="menu-item login-item" @click="navigateAndClose('/doctor/login')">
             <a-button type="primary" class="mobile-login-btn">
               <UserOutlined />
-              医生登录
+              {{ $t('nav.login') }}
             </a-button>
           </div>
         </div>
@@ -88,12 +100,15 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { HomeOutlined, MessageOutlined, TeamOutlined, InfoCircleOutlined, UserOutlined, MenuOutlined, CloseOutlined } from '@ant-design/icons-vue';
 
 const router = useRouter();
 const route = useRoute();
+const { locale } = useI18n();
 const selectedKeys = ref<string[]>(['home']);
 const showMobileMenu = ref(false);
+const currentLanguage = ref(locale.value);
 
 watch(() => route.path, (newPath) => {
   if (newPath === '/') {
@@ -106,6 +121,11 @@ watch(() => route.path, (newPath) => {
     selectedKeys.value = ['about'];
   }
 }, { immediate: true });
+
+const handleLanguageChange = (value: string) => {
+  locale.value = value;
+  currentLanguage.value = value;
+};
 
 const navigateTo = (path: string) => {
   router.push(path);
@@ -167,6 +187,16 @@ const navigateAndClose = (path: string) => {
   gap: 24px;
   flex: 1;
   justify-content: flex-end;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.language-select {
+  min-width: 100px;
 }
 
 .nav-menu {
@@ -240,6 +270,14 @@ const navigateAndClose = (path: string) => {
   margin-top: 16px;
   padding-top: 24px;
   border-top: 1px solid #f0f0f0;
+}
+
+.menu-item.language-item {
+  padding: 12px 24px;
+}
+
+.mobile-language-select {
+  width: 100%;
 }
 
 .mobile-login-btn {

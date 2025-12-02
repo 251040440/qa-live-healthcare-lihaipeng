@@ -6,13 +6,14 @@
     </div>
 
     <div class="doctors-container">
-      <div class="doctors-grid">
-        <a-card
-          v-for="doctor in allDoctors"
-          :key="doctor.id"
-          class="doctor-card"
-          :class="{ 'active': doctor.isActive }"
-        >
+      <a-spin :spinning="loading">
+        <div class="doctors-grid">
+          <a-card
+            v-for="doctor in allDoctors"
+            :key="doctor.id"
+            class="doctor-card"
+            :class="{ 'active': doctor.isActive }"
+          >
           <div class="card-header">
             <img :src="doctor.avatar" :alt="doctor.name" class="doctor-avatar" />
             <a-badge
@@ -41,24 +42,44 @@
               {{ doctor.isActive ? '进入诊室' : '暂未开放' }}
             </a-button>
           </div>
-        </a-card>
-      </div>
+          </a-card>
+        </div>
+      </a-spin>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { store, Doctor } from '../store';
+import { message } from 'ant-design-vue';
+import { getAllDoctors, DoctorUserResponse } from '../api';
 
 const router = useRouter();
 
-const allDoctors = computed(() => store.state.doctors);
+const allDoctors = ref<DoctorUserResponse[]>([]);
+const loading = ref(false);
 
-const goToConsultation = (doctor: Doctor) => {
+const loadDoctors = async () => {
+  loading.value = true;
+  try {
+    const doctors = await getAllDoctors();
+    allDoctors.value = doctors;
+  } catch (error) {
+    message.error('获取医生列表失败');
+    console.error('Failed to load doctors:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const goToConsultation = (doctor: DoctorUserResponse) => {
   router.push(`/consultation/${doctor.username}`);
 };
+
+onMounted(() => {
+  loadDoctors();
+});
 </script>
 
 <style scoped>

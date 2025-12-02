@@ -24,6 +24,28 @@ QA Service User 是医疗问答系统的用户管理服务，基于 Spring Boot 
 | POST | `/api/test/cors` | 测试 CORS 配置（POST 请求） | 无 | Map<String, Object>（可选） | TestResponse |
 | OPTIONS | `/api/test/cors` | 处理 CORS 预检请求 | 无 | 无 | 无内容 |
 
+### DoctorUserController
+
+**文件位置：** [../src/main/java/com/leansofx/qaserviceuser/controller/DoctorUserController.java](../src/main/java/com/leansofx/qaserviceuser/controller/DoctorUserController.java)
+
+医生用户管理控制器，提供医生用户的增删改查、认证和相关查询功能。
+
+| 方法 | 端点 | 描述 | 参数 | 请求体 | 响应 |
+|--------|----------|-------------|------------|--------------|----------|
+| POST | `/api/doctors` | 创建医生用户 | 无 | DoctorUserCreateRequest | DoctorUserResponse |
+| GET | `/api/doctors` | 获取所有医生用户 | 无 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/{id}` | 根据ID获取医生用户 | id: 用户ID | 无 | DoctorUserResponse |
+| GET | `/api/doctors/username/{username}` | 根据用户名获取医生用户 | username: 用户名 | 无 | DoctorUserResponse |
+| GET | `/api/doctors/active` | 获取所有活跃的医生用户 | 无 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/department/{department}` | 根据科室获取医生用户 | department: 科室名称 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/department/{department}/active` | 获取指定科室的活跃医生用户 | department: 科室名称 | 无 | List<DoctorUserResponse> |
+| GET | `/api/doctors/search` | 根据姓名搜索医生用户 | name: 医生姓名 | 无 | List<DoctorUserResponse> |
+| PUT | `/api/doctors/{id}` | 更新医生用户信息 | id: 用户ID | DoctorUserCreateRequest | DoctorUserResponse |
+| DELETE | `/api/doctors/{id}` | 删除医生用户 | id: 用户ID | 无 | Map<String, String> |
+| POST | `/api/doctors/authenticate` | 医生用户认证 | 无 | Map<String, String> | DoctorUserResponse |
+| GET | `/api/doctors/exists/{username}` | 检查用户名是否存在 | username: 用户名 | 无 | Map<String, Boolean> |
+| GET | `/api/doctors/count` | 获取医生用户总数 | 无 | 无 | Map<String, Long> |
+
 #### 数据结构示例
 
 **TestResponse（测试响应）**
@@ -44,6 +66,65 @@ QA Service User 是医疗问答系统的用户管理服务，基于 Spring Boot 
   "testData": "example",
   "userId": 123,
   "action": "test"
+}
+```
+
+**DoctorUserCreateRequest（医生用户创建请求）**
+```json
+{
+  "username": "doctor001",
+  "password": "password123",
+  "name": "张医生",
+  "title": "主任医师",
+  "department": "内科",
+  "avatar": "https://example.com/avatar.jpg",
+  "experience": "10年临床经验",
+  "specialties": ["心血管", "高血压"],
+  "isActive": true
+}
+```
+
+**DoctorUserResponse（医生用户响应）**
+```json
+{
+  "id": "doc_123456",
+  "username": "doctor001",
+  "name": "张医生",
+  "title": "主任医师",
+  "department": "内科",
+  "avatar": "https://example.com/avatar.jpg",
+  "experience": "10年临床经验",
+  "specialties": ["心血管", "高血压"],
+  "isActive": true
+}
+```
+
+**认证请求体（POST /api/doctors/authenticate）**
+```json
+{
+  "username": "doctor001",
+  "password": "password123"
+}
+```
+
+**删除成功响应（DELETE /api/doctors/{id}）**
+```json
+{
+  "message": "医生用户删除成功"
+}
+```
+
+**用户名存在检查响应（GET /api/doctors/exists/{username}）**
+```json
+{
+  "exists": true
+}
+```
+
+**医生用户总数响应（GET /api/doctors/count）**
+```json
+{
+  "count": 50
 }
 ```
 
@@ -158,6 +239,97 @@ curl -X POST http://localhost:8080/api/test/cors \
 curl -X GET http://localhost:8080/actuator/health
 ```
 
+### 医生用户管理
+
+**创建医生用户：**
+```bash
+curl -X POST http://localhost:8080/api/doctors \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "doctor001",
+    "password": "password123",
+    "name": "张医生",
+    "title": "主任医师",
+    "department": "内科",
+    "avatar": "https://example.com/avatar.jpg",
+    "experience": "10年临床经验",
+    "specialties": ["心血管", "高血压"],
+    "isActive": true
+  }'
+```
+
+**获取所有医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors
+```
+
+**根据ID获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/doc_123456
+```
+
+**根据用户名获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/username/doctor001
+```
+
+**获取活跃医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/active
+```
+
+**根据科室获取医生用户：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/department/内科
+```
+
+**搜索医生用户（按姓名）：**
+```bash
+curl -X GET "http://localhost:8080/api/doctors/search?name=张医生"
+```
+
+**更新医生用户信息：**
+```bash
+curl -X PUT http://localhost:8080/api/doctors/doc_123456 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "doctor001",
+    "password": "newpassword123",
+    "name": "张医生",
+    "title": "副主任医师",
+    "department": "心内科",
+    "avatar": "https://example.com/new_avatar.jpg",
+    "experience": "12年临床经验",
+    "specialties": ["心血管", "高血压", "心律失常"],
+    "isActive": true
+  }'
+```
+
+**删除医生用户：**
+```bash
+curl -X DELETE http://localhost:8080/api/doctors/doc_123456
+```
+
+**医生用户认证：**
+```bash
+curl -X POST http://localhost:8080/api/doctors/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "doctor001",
+    "password": "password123"
+  }'
+```
+
+**检查用户名是否存在：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/exists/doctor001
+```
+
+**获取医生用户总数：**
+```bash
+curl -X GET http://localhost:8080/api/doctors/count
+```
+
 ## 注意事项
 
 1. 当前项目处于开发阶段，仅包含测试端点
@@ -168,3 +340,4 @@ curl -X GET http://localhost:8080/actuator/health
 ## 版本历史
 
 - **v0.0.1-SNAPSHOT**：初始版本，包含基础的 CORS 测试功能和 Actuator 监控
+- **v0.0.2-SNAPSHOT**：新增医生用户管理功能，包括用户 CRUD 操作、认证、查询等功能

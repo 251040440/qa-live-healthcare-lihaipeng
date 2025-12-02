@@ -1,0 +1,30 @@
+{
+  "name": "doctor-list-page-test",
+  "version": "1.0.0",
+  "description": "E2E test for doctor list page data loading verification",
+  "main": "scripts/doctor-list-test.ts",
+  "scripts": {
+    "test": "node scripts/simple-test.js",
+    "clean": "rm -rf reports/assets/001-doctor-list-page-result-*"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.8.0",
+    "playwright": "^1.57.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "fs-extra": "^11.2.0"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "playwright",
+    "typescript",
+    "healthcare"
+  ],
+  "author": "QA Team",
+  "license": "ISC"
+}
